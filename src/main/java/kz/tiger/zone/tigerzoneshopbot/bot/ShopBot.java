@@ -43,9 +43,7 @@ public class ShopBot extends TelegramLongPollingBot {
                 CommandType commandType = commandResolver.resolve(message.getText());
 
                 switch (commandType) {
-                    case MENU -> {
-                        menuService.sendMenu(String.valueOf(message.getChatId()), this);
-                    }
+                    case MENU -> menuService.sendMenu(String.valueOf(message.getChatId()), this);
                 }
             }
         } else if (update.hasCallbackQuery()) {
@@ -54,9 +52,10 @@ public class ShopBot extends TelegramLongPollingBot {
             CallbackCommandType commandType = commandResolver.resolveCallback(callback.getData());
 
             switch (commandType) {
-                case SHOP -> {
-                    categoryService.sendCategories(String.valueOf(callback.getMessage().getChatId()), this);
-                }
+                case BACK_MENU -> menuService.sendMenu(String.valueOf(
+                        callback.getMessage().getChatId()), this);
+                case SHOP -> categoryService.sendCategories(String.valueOf(
+                        callback.getMessage().getChatId()), this);
             }
         }
     }

@@ -17,21 +17,12 @@ public class KeyboardFactory {
 
     public static ReplyKeyboard withCategories(List<CategoryModel> categoryModelList) {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<List<InlineKeyboardButton>> rowsInline = setRowsInline(categoryModelList);
         List<InlineKeyboardButton> rowInline = new ArrayList<>();
-        InlineKeyboardButton button;
-
-        for (int i = 0; i < categoryModelList.size(); i++) {
-            CategoryModel model = categoryModelList.get(i);
-            button = new InlineKeyboardButton();
-            if (i % MESSAGE_COLUMNS == 0) {
-                rowsInline.add(rowInline);
-                rowInline = new ArrayList<>();
-            }
-            button.setText(model.getTitle());
-            button.setCallbackData("category" + CALLBACK_DELIMITER + model.getId());
-            rowInline.add(button);
-        }
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("🔙 Назад");
+        button.setCallbackData(CallbackCommandType.BACK_MENU.toString());
+        rowInline.add(button);
         rowsInline.add(rowInline);
         inlineKeyboard.setKeyboard(rowsInline);
         return inlineKeyboard;
@@ -57,5 +48,26 @@ public class KeyboardFactory {
         rowsInline.add(rowInline);
         inlineKeyboard.setKeyboard(rowsInline);
         return inlineKeyboard;
+    }
+
+
+    private static List<List<InlineKeyboardButton>> setRowsInline(List<CategoryModel> categoryModelList) {
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline = new ArrayList<>();
+        InlineKeyboardButton button;
+
+        for (int i = 0; i < categoryModelList.size(); i++) {
+            CategoryModel model = categoryModelList.get(i);
+            button = new InlineKeyboardButton();
+            if (i % MESSAGE_COLUMNS == 0) {
+                rowsInline.add(rowInline);
+                rowInline = new ArrayList<>();
+            }
+            button.setText(model.getTitle());
+            button.setCallbackData("category" + CALLBACK_DELIMITER + model.getId());
+            rowInline.add(button);
+        }
+        rowsInline.add(rowInline);
+        return rowsInline;
     }
 }

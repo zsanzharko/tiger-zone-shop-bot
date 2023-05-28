@@ -10,12 +10,12 @@ import java.util.Map;
 
 public class TelegramMenuServiceImpl implements TelegramMenuService {
     private static final Map<String, CallbackCommandType> menu = Map.of(
-            "Магазин", CallbackCommandType.SHOP,
-            "Профиль", CallbackCommandType.PROFILE,
-            "FAQ", CallbackCommandType.FAQ,
-            "Гарантии", CallbackCommandType.GUARANTEE,
-            "Отзывы", CallbackCommandType.REVIEWS,
-            "Поддержка", CallbackCommandType.SUPPORT
+            "🏪 Магазин", CallbackCommandType.SHOP,
+            "👤 Профиль", CallbackCommandType.PROFILE,
+            "⁉️ FAQ", CallbackCommandType.FAQ,
+            "🔐 Гарантии", CallbackCommandType.GUARANTEE,
+            "📃 Отзывы", CallbackCommandType.REVIEWS,
+            "📞 Поддержка", CallbackCommandType.SUPPORT
     );
 
     @Override
