@@ -22,7 +22,7 @@ public class ShopCategoryEntity {
     @Column(name = "enabled")
     private Boolean isEnabled;
     @OneToMany(cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
+            fetch = FetchType.EAGER,
             mappedBy = "item",
             orphanRemoval = true)
     List<ShopItemEntity> subItemEntityList;

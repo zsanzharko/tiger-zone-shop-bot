@@ -9,5 +9,7 @@ import java.util.List;
 @Repository
 public interface ShopCategoryEntityRepository extends JpaRepository<ShopCategoryEntity, Integer> {
 
-    List<ShopCategoryEntity> findAllByIsEnabled(Boolean isEnabled);
+    List<ShopCategoryEntity> findAllByIsEnabledIsTrue();
+
+    ShopCategoryEntity findByIdAndIsEnabledIsTrue(Integer categoryId);
 }

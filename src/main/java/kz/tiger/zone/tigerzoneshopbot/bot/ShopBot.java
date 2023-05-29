@@ -3,9 +3,10 @@ package kz.tiger.zone.tigerzoneshopbot.bot;
 import kz.tiger.zone.tigerzoneshopbot.bot.command.CallbackCommandType;
 import kz.tiger.zone.tigerzoneshopbot.bot.command.CommandResolver;
 import kz.tiger.zone.tigerzoneshopbot.bot.command.CommandType;
-import kz.tiger.zone.tigerzoneshopbot.bot.service.category.TelegramCategoryService;
-import kz.tiger.zone.tigerzoneshopbot.bot.service.menu.TelegramMenuService;
-import kz.tiger.zone.tigerzoneshopbot.bot.service.menu.TelegramMenuServiceImpl;
+import kz.tiger.zone.tigerzoneshopbot.bot.service.TelegramGeneralService;
+import kz.tiger.zone.tigerzoneshopbot.bot.service.TelegramGeneralServiceImpl;
+import kz.tiger.zone.tigerzoneshopbot.bot.service.category.TelegramCategoryServiceImpl;
+import kz.tiger.zone.tigerzoneshopbot.bot.service.profile.TelegramProfileServiceImpl;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,22 +17,25 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.Objects;
+
+import static kz.tiger.zone.tigerzoneshopbot.bot.config.TelegramMessageConfig.CALLBACK_DELIMITER;
+
 @Component
 @Slf4j
 public class ShopBot extends TelegramLongPollingBot {
     private final String botUsername;
 
     private final CommandResolver commandResolver = new CommandResolver();
-    private final TelegramCategoryService categoryService;
-    private final TelegramMenuService menuService;
+    private final TelegramGeneralService generalService;
 
     public ShopBot(@Value("${bot.username}") String botUsername,
                    @Value("${bot.token}") String botToken,
-                   TelegramCategoryService categoryService) {
+                   TelegramCategoryServiceImpl categoryService,
+                   TelegramProfileServiceImpl profileService) {
         super(botToken);
         this.botUsername = botUsername;
-        this.categoryService = categoryService;
-        this.menuService = new TelegramMenuServiceImpl();
+        this.generalService = new TelegramGeneralServiceImpl(categoryService, profileService);
     }
 
     @SneakyThrows(TelegramApiException.class)
@@ -39,23 +43,38 @@ public class ShopBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage()) {
             Message message = update.getMessage();
+            var profile = generalService.registerUser(message.getChatId(), message.getFrom().getUserName());
             if (message.hasText()) {
                 CommandType commandType = commandResolver.resolve(message.getText());
 
-                switch (commandType) {
-                    case MENU -> menuService.sendMenu(String.valueOf(message.getChatId()), this);
+                if (Objects.requireNonNull(commandType) == CommandType.MENU) {
+                    generalService.sendMenu(profile, this);
                 }
             }
         } else if (update.hasCallbackQuery()) {
             CallbackQuery callback = update.getCallbackQuery();
-
+            var profile = generalService.registerUser(callback.getMessage().getChatId(), callback.getFrom().getUserName());
             CallbackCommandType commandType = commandResolver.resolveCallback(callback.getData());
-
-            switch (commandType) {
-                case BACK_MENU -> menuService.sendMenu(String.valueOf(
-                        callback.getMessage().getChatId()), this);
-                case SHOP -> categoryService.sendCategories(String.valueOf(
-                        callback.getMessage().getChatId()), this);
+            // FIXME: 5/29/2023 CallbackCommandType.ordinal()" because "commandType" is null
+            //  can invoke when command has not in commandType
+            if (commandType != null) {
+                switch (commandType) {
+                    case FAQ -> generalService.sendFAQ(profile, this);
+                    case GUARANTEE -> generalService.sendGuarantee(profile, this);
+                    case REVIEWS -> generalService.sendReview(profile, this);
+                    case SUPPORT -> generalService.sendSupport(profile, this);
+                    case BACK_MENU -> generalService.sendBackEditMenu(profile, this);
+                    case PROFILE -> generalService.sendProfile(profile, this);
+                    case SHOP -> generalService.sendCategories(profile, this);
+                }
+                return;
+            }
+            if (callback.getData()
+                    .substring(0, callback.getData().indexOf(CALLBACK_DELIMITER))
+                    .contains("category")) {
+                Integer categoryId = Integer.valueOf(callback.getData().substring(
+                        callback.getData().indexOf(CALLBACK_DELIMITER) + 1));
+                generalService.sendItemsInCategory(profile, categoryId, this);
             }
         }
     }

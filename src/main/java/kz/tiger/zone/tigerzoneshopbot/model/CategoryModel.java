@@ -4,7 +4,7 @@ import kz.tiger.zone.tigerzoneshopbot.entity.ShopCategoryEntity;
 import lombok.Data;
 
 @Data
-public class CategoryModel {
+public class CategoryModel implements ShopModel {
     private Integer id;
     private String title;
     private String description;
