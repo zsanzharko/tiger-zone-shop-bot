@@ -1,13 +1,14 @@
 package kz.tiger.zone.tigerzoneshopbot.bot.service;
 
 import kz.tiger.zone.tigerzoneshopbot.model.Profile;
+import kz.tiger.zone.tigerzoneshopbot.bot.enums.MessageType;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public interface TelegramGeneralService {
     Profile registerUser(Long chatId, String userName);
 
-    void sendMenu(Profile profile, AbsSender sender) throws TelegramApiException;
+    void sendMenu(Profile profile, AbsSender sender, MessageType messageType) throws TelegramApiException;
 
     void sendFAQ(Profile profile, AbsSender sender) throws TelegramApiException;
 

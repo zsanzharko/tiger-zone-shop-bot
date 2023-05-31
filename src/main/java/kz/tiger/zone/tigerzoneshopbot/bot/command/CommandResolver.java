@@ -1,5 +1,8 @@
 package kz.tiger.zone.tigerzoneshopbot.bot.command;
 
+import kz.tiger.zone.tigerzoneshopbot.bot.enums.CallbackCommandType;
+import kz.tiger.zone.tigerzoneshopbot.bot.enums.CommandType;
+
 public class CommandResolver {
     public CommandType resolve(String text) {
         if (text.equals("/start")) {

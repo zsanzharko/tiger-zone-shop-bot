@@ -1,12 +1,13 @@
 package kz.tiger.zone.tigerzoneshopbot.bot;
 
-import kz.tiger.zone.tigerzoneshopbot.bot.command.CallbackCommandType;
 import kz.tiger.zone.tigerzoneshopbot.bot.command.CommandResolver;
-import kz.tiger.zone.tigerzoneshopbot.bot.command.CommandType;
+import kz.tiger.zone.tigerzoneshopbot.bot.enums.CallbackCommandType;
+import kz.tiger.zone.tigerzoneshopbot.bot.enums.CommandType;
+import kz.tiger.zone.tigerzoneshopbot.bot.enums.MessageType;
 import kz.tiger.zone.tigerzoneshopbot.bot.service.TelegramGeneralService;
 import kz.tiger.zone.tigerzoneshopbot.bot.service.TelegramGeneralServiceImpl;
-import kz.tiger.zone.tigerzoneshopbot.bot.service.category.TelegramCategoryServiceImpl;
-import kz.tiger.zone.tigerzoneshopbot.bot.service.profile.TelegramProfileServiceImpl;
+import kz.tiger.zone.tigerzoneshopbot.service.category.ShopCategoryService;
+import kz.tiger.zone.tigerzoneshopbot.service.user.UserService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,11 +32,11 @@ public class ShopBot extends TelegramLongPollingBot {
 
     public ShopBot(@Value("${bot.username}") String botUsername,
                    @Value("${bot.token}") String botToken,
-                   TelegramCategoryServiceImpl categoryService,
-                   TelegramProfileServiceImpl profileService) {
+                   ShopCategoryService categoryService,
+                   UserService userService) {
         super(botToken);
         this.botUsername = botUsername;
-        this.generalService = new TelegramGeneralServiceImpl(categoryService, profileService);
+        this.generalService = new TelegramGeneralServiceImpl(categoryService, userService);
     }
 
     @SneakyThrows(TelegramApiException.class)
@@ -48,7 +49,7 @@ public class ShopBot extends TelegramLongPollingBot {
                 CommandType commandType = commandResolver.resolve(message.getText());
 
                 if (Objects.requireNonNull(commandType) == CommandType.MENU) {
-                    generalService.sendMenu(profile, this);
+                    generalService.sendMenu(profile, this, MessageType.MESSAGE);
                 }
             }
         } else if (update.hasCallbackQuery()) {

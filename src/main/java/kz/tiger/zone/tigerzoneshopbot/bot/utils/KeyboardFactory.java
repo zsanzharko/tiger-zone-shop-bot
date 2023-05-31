@@ -1,6 +1,6 @@
 package kz.tiger.zone.tigerzoneshopbot.bot.utils;
 
-import kz.tiger.zone.tigerzoneshopbot.bot.command.CallbackCommandType;
+import kz.tiger.zone.tigerzoneshopbot.bot.enums.CallbackCommandType;
 import kz.tiger.zone.tigerzoneshopbot.model.CategoryModel;
 import kz.tiger.zone.tigerzoneshopbot.model.ItemModel;
 import kz.tiger.zone.tigerzoneshopbot.model.ShopModel;
