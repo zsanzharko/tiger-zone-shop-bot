@@ -24,5 +24,5 @@ public interface TelegramGeneralService {
 
     void sendCategories(Profile profile, AbsSender sender) throws TelegramApiException;
 
-    void sendItemsInCategory(Profile profile, Integer categoryId, AbsSender sender) throws TelegramApiException;
+    void sendCategory(Profile profile, Integer categoryId, AbsSender sender) throws TelegramApiException;
 }

@@ -15,6 +15,8 @@ public class ShopCategoryEntity {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(name = "image")
+    private byte[] image;
     @Column(name = "title")
     private String title;
     @Column(name = "description", length = 2500)
@@ -25,5 +27,5 @@ public class ShopCategoryEntity {
             fetch = FetchType.EAGER,
             mappedBy = "item",
             orphanRemoval = true)
-    List<ShopItemEntity> subItemEntityList;
+    List<ShopProductEntity> subItemEntityList;
 }

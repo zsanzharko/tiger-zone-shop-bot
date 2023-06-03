@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.Map;
 
 public class TelegramGeneralServiceImpl implements TelegramGeneralService {
@@ -159,11 +160,13 @@ public class TelegramGeneralServiceImpl implements TelegramGeneralService {
     }
 
     @Override
-    public void sendItemsInCategory(Profile profile, Integer categoryId, AbsSender sender) throws TelegramApiException {
+    public void sendCategory(Profile profile, Integer categoryId, AbsSender sender) throws TelegramApiException {
+        var products = categoryService.getAllEnabledItems(categoryId);
+
         SendPhoto supportMessage = SendPhoto.builder()
                 .chatId(profile.getChatId())
                 .photo(new InputFile(readFileFromResources("image/shop.png")))
-                .replyMarkup(KeyboardFactory.withProducts(categoryService.getAllEnabledItems(categoryId)))
+                .replyMarkup(KeyboardFactory.withProducts(products))
                 .caption("Магазин")
                 .build();
         deleteMessageId(profile, sender);

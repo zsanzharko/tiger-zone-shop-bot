@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface ShopCategoryService {
 
+    CategoryModel getCategory(Integer categoryId);
+
     List<CategoryModel> getAllEnabledCategories();
 
     List<ItemModel> getAllEnabledItems(Integer categoryId);

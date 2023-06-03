@@ -7,12 +7,22 @@ import kz.tiger.zone.tigerzoneshopbot.repository.ShopCategoryEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ShopCategoryServiceImpl implements ShopCategoryService {
     private final ShopCategoryEntityRepository categoryRepository;
+
+    @Override
+    public CategoryModel getCategory(Integer categoryId) {
+        var category = categoryRepository.findById(categoryId);
+        if (category.isPresent()) {
+            return CategoryModel.transform(category.get());
+        }
+        throw new EntityNotFoundException();
+    }
 
     @Override
     public List<CategoryModel> getAllEnabledCategories() {
