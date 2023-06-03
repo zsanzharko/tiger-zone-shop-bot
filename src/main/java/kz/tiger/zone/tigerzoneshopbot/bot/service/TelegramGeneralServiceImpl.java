@@ -12,7 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.File;
+import java.io.*;
 import java.util.Map;
 
 public class TelegramGeneralServiceImpl implements TelegramGeneralService {
@@ -54,11 +54,13 @@ public class TelegramGeneralServiceImpl implements TelegramGeneralService {
 
     @Override
     public void sendFAQ(Profile profile, AbsSender sender) throws TelegramApiException {
+        final String text = getTextFrom(
+                readFileFromResources("text/FAQ.txt"), "FAQ");
         SendPhoto faqMessage = SendPhoto.builder()
                 .chatId(profile.getChatId())
                 .photo(new InputFile(readFileFromResources("image/faq.png")))
                 .replyMarkup(KeyboardFactory.withBackToMenu())
-                .caption("FAQ")
+                .caption(text)
                 .build();
         deleteMessageId(profile, sender);
         var savedMessage = sender.execute(faqMessage);
@@ -67,11 +69,14 @@ public class TelegramGeneralServiceImpl implements TelegramGeneralService {
 
     @Override
     public void sendGuarantee(Profile profile, AbsSender sender) throws TelegramApiException {
+        final String text = getTextFrom(
+                readFileFromResources("text/Guarantee.txt"), "Гарантии");
         SendPhoto guaranteeMessage = SendPhoto.builder()
                 .chatId(profile.getChatId())
                 .photo(new InputFile(readFileFromResources("image/guarantees.png")))
                 .replyMarkup(KeyboardFactory.withBackToMenu())
-                .caption("Гарантии")
+                .caption(text)
+                .parseMode("Markdown")
                 .build();
         deleteMessageId(profile, sender);
         var savedMessage = sender.execute(guaranteeMessage);
@@ -80,11 +85,14 @@ public class TelegramGeneralServiceImpl implements TelegramGeneralService {
 
     @Override
     public void sendReview(Profile profile, AbsSender sender) throws TelegramApiException {
+        final String text = getTextFrom(
+                readFileFromResources("text/Review.txt"), "Отзывы");
         SendPhoto guaranteeMessage = SendPhoto.builder()
                 .chatId(profile.getChatId())
                 .photo(new InputFile(readFileFromResources("image/reviews.png")))
                 .replyMarkup(KeyboardFactory.withBackToMenu())
-                .caption("Отзывы")
+                .caption(text)
+                .parseMode("Markdown")
                 .build();
         deleteMessageId(profile, sender);
         var savedMessage = sender.execute(guaranteeMessage);
@@ -93,11 +101,13 @@ public class TelegramGeneralServiceImpl implements TelegramGeneralService {
 
     @Override
     public void sendSupport(Profile profile, AbsSender sender) throws TelegramApiException {
+        final String text = getTextFrom(
+                readFileFromResources("text/Support.txt"), "Поддержка");
         SendPhoto supportMessage = SendPhoto.builder()
                 .chatId(profile.getChatId())
                 .photo(new InputFile(readFileFromResources("image/support.png")))
                 .replyMarkup(KeyboardFactory.withBackToMenu())
-                .caption("Поддержка")
+                .caption(text)
                 .parseMode("Markdown")
                 .build();
         deleteMessageId(profile, sender);
@@ -109,7 +119,7 @@ public class TelegramGeneralServiceImpl implements TelegramGeneralService {
     public void sendProfile(Profile profile, AbsSender sender) throws TelegramApiException {
         final String profileText = String.format("""
                 Профиль:
-                Пользователь: %s
+                Пользователь: **%s**
                 """, profile.getUsername());
         SendPhoto profileMessage = SendPhoto.builder()
                 .chatId(profile.getChatId())
@@ -141,7 +151,7 @@ public class TelegramGeneralServiceImpl implements TelegramGeneralService {
                 .chatId(profile.getChatId())
                 .photo(new InputFile(readFileFromResources("image/shop.png")))
                 .replyMarkup(KeyboardFactory.withCategories(categoryService.getAllEnabledCategories()))
-                .caption("Shop")
+                .caption("Магазин")
                 .build();
         deleteMessageId(profile, sender);
         var savedMessage = sender.execute(supportMessage);
@@ -154,7 +164,7 @@ public class TelegramGeneralServiceImpl implements TelegramGeneralService {
                 .chatId(profile.getChatId())
                 .photo(new InputFile(readFileFromResources("image/shop.png")))
                 .replyMarkup(KeyboardFactory.withProducts(categoryService.getAllEnabledItems(categoryId)))
-                .caption("Shop")
+                .caption("Магазин")
                 .build();
         deleteMessageId(profile, sender);
         var savedMessage = sender.execute(supportMessage);
@@ -171,5 +181,18 @@ public class TelegramGeneralServiceImpl implements TelegramGeneralService {
 
     private File readFileFromResources(String filePath) {
         return new File("src/main/resources/" + filePath);
+    }
+
+    private String getTextFrom(File file, String defaultText) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))){
+            StringBuilder builder = new StringBuilder(defaultText + "\n");
+            String st;
+            while ((st = br.readLine()) != null) {
+                builder.append(st);
+            }
+            return builder.toString();
+        } catch (IOException e) {
+            return defaultText;
+        }
     }
 }
