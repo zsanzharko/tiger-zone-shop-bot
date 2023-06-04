@@ -76,6 +76,12 @@ public class ShopBot extends TelegramLongPollingBot {
                 Integer categoryId = Integer.valueOf(callback.getData().substring(
                         callback.getData().indexOf(CALLBACK_DELIMITER) + 1));
                 generalService.sendCategory(profile, categoryId, this);
+            } else if (callback.getData()
+                    .substring(0, callback.getData().indexOf(CALLBACK_DELIMITER))
+                    .contains("product")) {
+                Integer categoryId = Integer.valueOf(callback.getData().substring(
+                        callback.getData().indexOf(CALLBACK_DELIMITER) + 1));
+                generalService.sendProduct(profile, categoryId, this);
             }
         }
     }

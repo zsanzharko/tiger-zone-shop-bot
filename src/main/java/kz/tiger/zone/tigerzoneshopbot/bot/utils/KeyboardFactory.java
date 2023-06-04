@@ -2,7 +2,7 @@ package kz.tiger.zone.tigerzoneshopbot.bot.utils;
 
 import kz.tiger.zone.tigerzoneshopbot.bot.enums.CallbackCommandType;
 import kz.tiger.zone.tigerzoneshopbot.model.CategoryModel;
-import kz.tiger.zone.tigerzoneshopbot.model.ItemModel;
+import kz.tiger.zone.tigerzoneshopbot.model.ProductModel;
 import kz.tiger.zone.tigerzoneshopbot.model.ShopModel;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -19,13 +19,13 @@ public class KeyboardFactory {
 
     public static ReplyKeyboard withCategories(List<CategoryModel> categoryModelList) {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInline = setRowsInline(categoryModelList);
+        List<List<InlineKeyboardButton>> rowsInline = setRowsInline(categoryModelList, "category");
         return getBackRowKeyboard(inlineKeyboard, rowsInline, CallbackCommandType.BACK_MENU);
     }
 
-    public static ReplyKeyboard withProducts(List<ItemModel> itemModelList) {
+    public static ReplyKeyboard withProducts(List<ProductModel> productModelList) {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInline = setRowsInline(itemModelList);
+        List<List<InlineKeyboardButton>> rowsInline = setRowsInline(productModelList, "product");
         return getBackRowKeyboard(inlineKeyboard, rowsInline, CallbackCommandType.SHOP);
     }
 
@@ -71,7 +71,7 @@ public class KeyboardFactory {
     }
 
 
-    private static List<List<InlineKeyboardButton>> setRowsInline(List<? extends ShopModel> categoryModelList) {
+    private static List<List<InlineKeyboardButton>> setRowsInline(List<? extends ShopModel> categoryModelList, String modelType) {
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
         List<InlineKeyboardButton> rowInline = new ArrayList<>();
         InlineKeyboardButton button;
@@ -84,10 +84,15 @@ public class KeyboardFactory {
                 rowInline = new ArrayList<>();
             }
             button.setText(model.getTitle());
-            button.setCallbackData("category" + CALLBACK_DELIMITER + model.getId());
+            button.setCallbackData(modelType + CALLBACK_DELIMITER + model.getId());
             rowInline.add(button);
         }
         rowsInline.add(rowInline);
         return rowsInline;
+    }
+
+    public static ReplyKeyboard withProductBuy() {
+        // FIXME: 6/4/2023
+        return withBackToMenu();
     }
 }

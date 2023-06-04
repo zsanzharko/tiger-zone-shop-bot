@@ -6,7 +6,8 @@ import lombok.Data;
 @Data
 public class CategoryModel implements ShopModel {
     private Integer id;
-    private byte[] image;
+    private String imageUrl;
+    private String productsImage;
     private String title;
     private String description;
 
@@ -14,7 +15,8 @@ public class CategoryModel implements ShopModel {
         CategoryModel model = new CategoryModel();
         model.id = entity.getId();
         model.title = entity.getTitle();
-        model.image = entity.getImage();
+        model.imageUrl = entity.getImageUrl();
+        model.productsImage = entity.getProductsImage();
         model.description = entity.getDescription();
         return model;
     }

@@ -15,8 +15,10 @@ public class ShopCategoryEntity {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "image")
-    private byte[] image;
+    @Column(name = "image_url", length = 2500)
+    private String imageUrl;
+    @Column(name = "products_image")
+    private String productsImage;;
     @Column(name = "title")
     private String title;
     @Column(name = "description", length = 2500)

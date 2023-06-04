@@ -1,5 +1,6 @@
 package kz.tiger.zone.tigerzoneshopbot.bot.service;
 
+import kz.tiger.zone.tigerzoneshopbot.bot.ShopBot;
 import kz.tiger.zone.tigerzoneshopbot.model.Profile;
 import kz.tiger.zone.tigerzoneshopbot.bot.enums.MessageType;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -25,4 +26,6 @@ public interface TelegramGeneralService {
     void sendCategories(Profile profile, AbsSender sender) throws TelegramApiException;
 
     void sendCategory(Profile profile, Integer categoryId, AbsSender sender) throws TelegramApiException;
+
+    void sendProduct(Profile profile, Integer categoryId, AbsSender sender) throws TelegramApiException;
 }

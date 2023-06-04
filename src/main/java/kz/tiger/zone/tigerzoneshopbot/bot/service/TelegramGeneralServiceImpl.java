@@ -6,16 +6,18 @@ import kz.tiger.zone.tigerzoneshopbot.bot.utils.KeyboardFactory;
 import kz.tiger.zone.tigerzoneshopbot.model.Profile;
 import kz.tiger.zone.tigerzoneshopbot.service.category.ShopCategoryService;
 import kz.tiger.zone.tigerzoneshopbot.service.user.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.Map;
 
+@Slf4j
 public class TelegramGeneralServiceImpl implements TelegramGeneralService {
     private static final Map<String, CallbackCommandType> menu = Map.of(
             "🏪 Магазин", CallbackCommandType.SHOP,
@@ -162,16 +164,68 @@ public class TelegramGeneralServiceImpl implements TelegramGeneralService {
     @Override
     public void sendCategory(Profile profile, Integer categoryId, AbsSender sender) throws TelegramApiException {
         var products = categoryService.getAllEnabledItems(categoryId);
+        var category = categoryService.getCategory(categoryId);
+        String mainText = "Магазин";
 
-        SendPhoto supportMessage = SendPhoto.builder()
+        SendPhoto categoryMessage = SendPhoto.builder()
                 .chatId(profile.getChatId())
-                .photo(new InputFile(readFileFromResources("image/shop.png")))
+                .photo(resolveInputFile(category.getImageUrl(), "image/shop.png"))
                 .replyMarkup(KeyboardFactory.withProducts(products))
-                .caption("Магазин")
+                .caption(mainText)
                 .build();
         deleteMessageId(profile, sender);
-        var savedMessage = sender.execute(supportMessage);
-        userService.saveLastMessageId(profile.getChatId(), savedMessage.getMessageId());
+        try {
+            var savedMessage = sender.execute(categoryMessage);
+            userService.saveLastMessageId(profile.getChatId(), savedMessage.getMessageId());
+        } catch (TelegramApiRequestException e) {
+            if (e.getMessage().contains("wrong remote file identifier specified: Wrong padding in the string")) {
+                SendPhoto categoryExceptionMessage = SendPhoto.builder()
+                        .chatId(profile.getChatId())
+                        .photo(new InputFile(readFileFromResources("image/shop.png")))
+                        .replyMarkup(KeyboardFactory.withProducts(products))
+                        .caption(mainText)
+                        .build();
+                var savedMessage = sender.execute(categoryExceptionMessage);
+                userService.saveLastMessageId(profile.getChatId(), savedMessage.getMessageId());
+            }
+        }
+    }
+
+    @Override
+    public void sendProduct(Profile profile, Integer productId, AbsSender sender) throws TelegramApiException {
+        var product = categoryService.getProduct(productId);
+
+        final String messageText = String.format("""
+                Продукт: %s
+                
+                Описание: %s
+                
+                Цена: Бесплатно
+                """, product.getTitle(), product.getDescription());
+
+        SendPhoto productMessage = SendPhoto.builder()
+                .chatId(profile.getChatId())
+                .caption(messageText)
+                .photo(resolveInputFile(product.getImageUrl(), "image/shop.png"))
+                .replyMarkup(KeyboardFactory.withProductBuy())
+                .build();
+        deleteMessageId(profile, sender);
+
+        try {
+            var savedMessage = sender.execute(productMessage);
+            userService.saveLastMessageId(profile.getChatId(), savedMessage.getMessageId());
+        } catch (TelegramApiRequestException e) {
+            if (e.getMessage().contains("wrong remote file identifier specified: Wrong padding in the string")) {
+                SendPhoto productExceptionMessage = SendPhoto.builder()
+                        .chatId(profile.getChatId())
+                        .caption(messageText)
+                        .photo(new InputFile(readFileFromResources("image/shop.png")))
+                        .replyMarkup(KeyboardFactory.withProductBuy())
+                        .build();
+                var savedMessage = sender.execute(productExceptionMessage);
+                userService.saveLastMessageId(profile.getChatId(), savedMessage.getMessageId());
+            }
+        }
     }
 
     private void deleteMessageId(Profile profile, AbsSender sender) throws TelegramApiException {
@@ -180,6 +234,14 @@ public class TelegramGeneralServiceImpl implements TelegramGeneralService {
                 .messageId(profile.getLastMessageId())
                 .build();
         sender.execute(deleteMessage);
+    }
+
+    private InputFile resolveInputFile(String imageUrl, String defaultFilePath) {
+        if (imageUrl == null || imageUrl.isBlank()) {
+            log.warn("Image url is not support. Resolve to default image");
+            return new InputFile(readFileFromResources(defaultFilePath));
+        }
+        return new InputFile(imageUrl);
     }
 
     private File readFileFromResources(String filePath) {

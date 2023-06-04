@@ -14,8 +14,8 @@ public class ShopProductEntity {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "image")
-    private byte[] image;
+    @Column(name = "image_url", length = 2500)
+    private String imageUrl;
     @ManyToOne
     @JoinColumn(name="item_id", nullable=false)
     private ShopCategoryEntity item;
