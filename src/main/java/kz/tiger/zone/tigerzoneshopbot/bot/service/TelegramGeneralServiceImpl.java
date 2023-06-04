@@ -65,6 +65,7 @@ public class TelegramGeneralServiceImpl implements TelegramGeneralService {
                 .photo(new InputFile(readFileFromResources("image/faq.png")))
                 .replyMarkup(KeyboardFactory.withBackToMenu())
                 .caption(text)
+                .parseMode("Markdown")
                 .build();
         deleteMessageId(profile, sender);
         var savedMessage = sender.execute(faqMessage);
