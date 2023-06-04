@@ -92,7 +92,14 @@ public class KeyboardFactory {
     }
 
     public static ReplyKeyboard withProductBuy() {
-        // FIXME: 6/4/2023
-        return withBackToMenu();
+        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline = new ArrayList<>();
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("Купить");
+        button.setCallbackData("TEST" + CALLBACK_DELIMITER);
+        rowInline.add(button);
+        rowsInline.add(rowInline);
+        return getBackRowKeyboard(inlineKeyboard, rowsInline, CallbackCommandType.BACK_MENU);
     }
 }

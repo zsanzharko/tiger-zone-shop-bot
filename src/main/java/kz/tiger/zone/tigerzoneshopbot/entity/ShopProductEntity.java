@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "product", schema = "shop")
@@ -23,6 +24,11 @@ public class ShopProductEntity {
     private String title;
     @Column(name = "description", length = 1024)
     private String description;
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER,
+            mappedBy = "product",
+            orphanRemoval = true)
+    private List<ShopProductCostEntity> productCostList;
     @Column(name = "enabled")
     private Boolean isEnabled;
 }

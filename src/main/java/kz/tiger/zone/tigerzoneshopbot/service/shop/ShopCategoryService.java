@@ -1,4 +1,4 @@
-package kz.tiger.zone.tigerzoneshopbot.service.category;
+package kz.tiger.zone.tigerzoneshopbot.service.shop;
 
 import kz.tiger.zone.tigerzoneshopbot.model.CategoryModel;
 import kz.tiger.zone.tigerzoneshopbot.model.ProductModel;

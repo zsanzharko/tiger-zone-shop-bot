@@ -6,7 +6,7 @@ import kz.tiger.zone.tigerzoneshopbot.bot.enums.CommandType;
 import kz.tiger.zone.tigerzoneshopbot.bot.enums.MessageType;
 import kz.tiger.zone.tigerzoneshopbot.bot.service.TelegramGeneralService;
 import kz.tiger.zone.tigerzoneshopbot.bot.service.TelegramGeneralServiceImpl;
-import kz.tiger.zone.tigerzoneshopbot.service.category.ShopCategoryService;
+import kz.tiger.zone.tigerzoneshopbot.service.shop.ShopCategoryService;
 import kz.tiger.zone.tigerzoneshopbot.service.user.UserService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

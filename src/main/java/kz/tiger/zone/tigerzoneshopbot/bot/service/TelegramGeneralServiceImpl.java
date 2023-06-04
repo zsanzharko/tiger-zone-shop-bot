@@ -4,12 +4,13 @@ import kz.tiger.zone.tigerzoneshopbot.bot.enums.CallbackCommandType;
 import kz.tiger.zone.tigerzoneshopbot.bot.enums.MessageType;
 import kz.tiger.zone.tigerzoneshopbot.bot.utils.KeyboardFactory;
 import kz.tiger.zone.tigerzoneshopbot.model.Profile;
-import kz.tiger.zone.tigerzoneshopbot.service.category.ShopCategoryService;
+import kz.tiger.zone.tigerzoneshopbot.service.shop.ShopCategoryService;
 import kz.tiger.zone.tigerzoneshopbot.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
@@ -200,14 +201,22 @@ public class TelegramGeneralServiceImpl implements TelegramGeneralService {
                 
                 Описание: %s
                 
-                Цена: Бесплатно
-                """, product.getTitle(), product.getDescription());
+                Цена: %s
+                """,
+                product.getTitle(),
+                product.getDescription().isBlank() ? "Пусто, но скоро мы это исправим" : product.getDescription(),
+                product.getCost().isBlank() ? "Недоступно" : product.getCost() + " " + product.getCurrency());
+
+        ReplyKeyboard keyboard = product.getCost().isBlank() ?
+                KeyboardFactory.withBackToMenu() :
+                KeyboardFactory.withProductBuy();
+
 
         SendPhoto productMessage = SendPhoto.builder()
                 .chatId(profile.getChatId())
                 .caption(messageText)
                 .photo(resolveInputFile(product.getImageUrl(), "image/shop.png"))
-                .replyMarkup(KeyboardFactory.withProductBuy())
+                .replyMarkup(keyboard)
                 .build();
         deleteMessageId(profile, sender);
 
